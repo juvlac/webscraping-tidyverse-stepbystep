@@ -346,18 +346,16 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Web Scraping with R: Collecting data on sports courses</h1>
+<h1 class="title toc-ignore">Web Scraping à la Tidyverse: rvest</h1>
 <h4 class="author">by Juliana Vega Lacorte</h4>
 <h4 class="date">May 22, 2019</h4>
 
 </div>
 
 
-<div id="web-scraping-a-la-tidyverse-rvest" class="section level1">
-<h1>2. Web scraping à la Tidyverse: rvest</h1>
-<div id="importing-html-files-into-r-1" class="section level2">
-<h2>2.1 Importing HTML files into R</h2>
-<p>When we worked with the XML package in the previous section, importing and parsing required two steps: accessing the website to import the HTML document with <code>getURL()</code>, and parsing it with <code>htmlParse()</code>. In the tidyverse, this can be accomplished in one step using <code>read_html()</code> from the rvest package. We only need to provide the URL of our target website (already stored in <code>husports_url</code>) and the function will take care of converting the URL into a connection, importing, and parsing the document.</p>
+<div id="importing-html-files-into-r-1" class="section level1">
+<h1>1 Importing HTML files into R</h1>
+<p>When we worked with the XML package in the previous tutorial, importing and parsing required two steps: accessing the website to import the HTML document with <code>getURL()</code>, and parsing it with <code>htmlParse()</code>. In the tidyverse, this can be accomplished in one step using <code>read_html()</code> from the rvest package. We only need to provide the URL of our target website (already stored in <code>husports_url</code>) and the function will take care of converting the URL into a connection, importing, and parsing the document.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(xml2)
 
 husports &lt;-<span class="st"> </span><span class="kw">read_html</span>(husports_url)
@@ -368,8 +366,8 @@ husports &lt;-<span class="st"> </span><span class="kw">read_html</span>(husport
 ##  $ doc :&lt;externalptr&gt; 
 ##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;xml_document&quot; &quot;xml_node&quot;</code></pre>
 </div>
-<div id="extracting-nodes-with-html_nodes" class="section level2">
-<h2>2.2 Extracting nodes with html_nodes()</h2>
+<div id="extracting-nodes-with-html_nodes" class="section level1">
+<h1>2 Extracting nodes with html_nodes()</h1>
 <p>We want to search and extract the sports names from our parsed document <code>husports_ti</code>. We already know this information resides on <code>&lt;a&gt;</code> nodes. To find them, we employ <code>html_nodes()</code> and the XPath expression we used before. Then we need to extract the values from the nodes. We can do this using the pipe operator <code>%&gt;%</code> from magrittr, passing the node set as argument to the function <code>html_text()</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rvest)
 <span class="kw">library</span>(magrittr)
@@ -387,8 +385,8 @@ sports_program &lt;-<span class="st"> </span>husports <span class="op">%&gt;%</s
   </script>
 </div>
 </div>
-<div id="getting-links-to-all-courses" class="section level2">
-<h2>2.3 Getting links to all courses</h2>
+<div id="getting-links-to-all-courses" class="section level1">
+<h1>3 Getting links to all courses</h1>
 <p>Extracting the links works very similar to how we obtained the sports names. But instead of using <code>html_teXT()</code>, we need <code>html_attr(&quot;href&quot;)</code> to extract the values of the attributes in the <code>&lt;a&gt;</code> nodes.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hrefs &lt;-<span class="st"> </span>husports <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">                </span><span class="co"># Locate nodes</span>
@@ -404,8 +402,8 @@ sports_program &lt;-<span class="st"> </span>husports <span class="op">%&gt;%</s
   </script>
 </div>
 </div>
-<div id="importing-and-parsing-several-pages-1" class="section level2">
-<h2>2.4 Importing and parsing several pages</h2>
+<div id="importing-and-parsing-several-pages-1" class="section level1">
+<h1>4 Importing and parsing several pages</h1>
 <p>To gather the HTML documents of all courses we set up our function in the same way described in <a href="#importing-and-parsing-several-pages">1.5.1 Importing and parsing several pages</a>. The only difference is that with tidyverse tools we can write a more concise function. After appending each page name to our base url and form the full links, we use <code>map()</code> from the purrr package to apply <code>read_html()</code> to each element in <code>courses_parsed</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">getCoursesHtmlv2 &lt;-<span class="st"> </span><span class="cf">function</span>(pagename, baseurl) {
   <span class="kw">require</span>(purrr)
@@ -450,8 +448,8 @@ freecourses[<span class="dv">40</span>]</code></pre></div>
 <p>We have now 216 courses in our list, exactly the same result we got in <a href="#filtering-out-free-courses">1.5.2 Filtering out free courses</a>.</p>
 <hr />
 </div>
-<div id="extracting-data-on-sport-courses-1" class="section level2">
-<h2>2.5 Extracting data on sport courses</h2>
+<div id="extracting-data-on-sport-courses-1" class="section level1">
+<h1>5 Extracting data on sport courses</h1>
 <p>Creating <strong>our own function</strong> <code>getData2</code> will help us keep an automatic process of data extraction. The function gathers the sport’s name, level, day, time, period, and prices from each of the courses in our list.</p>
 <p>The extra steps in making the object <code>prices</code> are intended to process the contents of the node set and avoid extracting irrelevant text. Recall that the four prices we need are contained in the characters before the currency symbol. To extract them, we use <code>str_extract()</code> from the sringr package. Then, <code>str_trim()</code> will get rid of the white space at the end of the string.</p>
 <p>To describe the <code>&quot;24/ 36/ 36/ 56 €&quot;</code> string pattern, we can use the regular expression <code>.*€</code>, which matches any single character appearing zero or more times followed by an euro symbol. However, we only want to extract the part that’s <em>before</em> the euro symbol. What we need is to combine our regular expression with a <em>look-around</em> assertion. More precisely, a <em>positive look-ahead</em> assertion which matches something followed by something else (e.g. euro symbol) without including the latter in the matching result. For example, <code>p(?=€)</code> matches a p that is followed by €, without including the € part.</p>
